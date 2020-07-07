@@ -4,6 +4,6 @@
     <application>
         <meta-data
             android:name="org.godotengine.plugin.v1.UnityAdsGodot"
-            android:value="com.jandans.unityaddsgodot.UnityAddsInterface" />
+            android:value="com.jandans.unityaddsgodot.UnityAdsInterface" />
     </application>
 </manifest>

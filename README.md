@@ -4,23 +4,18 @@ Current version of the `UnityAdsGodot.aar` and example project is available for 
 
 ## Requirements
 
-The new export templates for android was introduced in godot 3.2.1, but we cannot link custom plugins as export settings panel is missing "Plugins" field so the minimum version would be 3.2.2 for this to run.
+The new export templates for android was introduced in Godot 3.2.2. So Godot 3.2.2 and up is required
 
 ## Setup
 
-- Open up the Android export template settings by going to `Project -> Export`. 
+- In Godot open up the Android export template settings by going to `Project -> Export`. 
   - Select `Android` and enable costom build. 
-  - In plugins feald type in `UnityAdsGodot`. 
-- Open up the Godots projects `android` folder and create a folder called `plugins`. 
-- Place the `UnityAdsGodot.aar` inside the freshly created plugins folder. 
+  - Instal custom android build template. 
 - Download UnityAds Android library from [here](https://github.com/Unity-Technologies/unity-ads-android/releases)
-- Place the downloaded `unity-ads.aar` inside `android/build/libs/plugins`
-- Check if `android/build/build.gradle` does not have any filters for specific plugins and if theres a filter update the line as folows 
-
-```
-    // Godot prebuilt plugins
-    implementation fileTree(dir: 'libs/plugins', include: ["*.aar"])
-```
+- Open up the Godots projects `android` folder and create a folder called `plugins` if it isn't there. 
+- Place the `UnityAdsGodot.aar` inside the freshly created plugins folder along with `unity-ads.aar` and `UnityAdsGodot.gdap`. 
+- The min SDK version will need a update so open up the `android\build\config.gradle` and update `minSdkVersion` to 26
+- Last thing is to enable this plugin under `Project -> Export -> Android -> Plugins` and check the checkbox besides `Unity Ads Godot`
 
 ## Usage
 
@@ -62,12 +57,18 @@ func _on_showad_pressed():
 
 ## Compiling from source
 
-TODO: Describe how to do this.
+- Clone out this repo
+- Download UnityAds Android library from [here](https://github.com/Unity-Technologies/unity-ads-android/releases) and place it inside `unityadsgodot\libs` folder
+- Download corresponding version of `godot-lib.3.2.2.stable.release` from [here](https://godotengine.org/download/) and place it again in `unityadsgodot\libs` folder
+- Open the project in android studio and run `gradlew build` from terminal to build the aar libs
+- Build results should be located inside `unityadsgodot\build\outputs\aar` 
+- Build output can be copied to Godot projects `android\plugins` alongside dependencies and plugin description file from `Godot\UnityAdsGodot.gdap`
 
 ## TODOs
 
 - [ ] Improve documentation
-- [ ] Code/Project cleanup
+- [ ] Code cleanup
+- [x] Project cleanup
 - [ ] Banner ads are not working and seems that api is deprecated. Need to investigate that
 - [ ] Improve setup (possibly create a script for that)
 - [ ] Update error code reporting to GDScript

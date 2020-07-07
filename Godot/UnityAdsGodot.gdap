@@ -1,0 +1,9 @@
+[config]
+
+name="UnityAdsGodot"
+binary_type="local"
+binary="UnityAdsGodot.aar"
+
+[dependencies]
+
+local=["unity-ads.aar"]

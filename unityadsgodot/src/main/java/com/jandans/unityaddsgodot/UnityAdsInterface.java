@@ -22,9 +22,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class UnityAddsInterface extends GodotPlugin implements IUnityAdsListener, IUnityBannerListener {
+public class UnityAdsInterface extends GodotPlugin implements IUnityAdsListener, IUnityBannerListener {
 
-    private final String TAG = "UnityAddsInterface";
+    private final String TAG = "UnityAdsInterface";
     private SignalInfo UnityAdsReady = new SignalInfo("UnityAdsReady");
     private SignalInfo UnityAdsStart = new SignalInfo("UnityAdsStart");
     private SignalInfo UnityAdsFinish = new SignalInfo("UnityAdsFinish",  String.class);
@@ -36,9 +36,7 @@ public class UnityAddsInterface extends GodotPlugin implements IUnityAdsListener
     private SignalInfo UnityBannerHide = new SignalInfo("UnityBannerHide");
     private SignalInfo UnityBannerError = new SignalInfo("UnityBannerError", String.class);
 
-    Activity baseActivity = null;
-
-    public UnityAddsInterface(Godot godot) {
+    public UnityAdsInterface(Godot godot) {
         super(godot);
     }
 
@@ -77,18 +75,11 @@ public class UnityAddsInterface extends GodotPlugin implements IUnityAdsListener
         return retVal;
     }
 
-    @Nullable
-    @Override
-    public View onMainCreateView(Activity activity) {
-        baseActivity = activity;
-        return super.onMainCreateView(activity);
-    }
-
     public void initialise(String appId, boolean testMode)
     {
         try
         {
-            UnityAds.initialize(baseActivity, appId, testMode);
+            UnityAds.initialize(getActivity(), appId, testMode);
             UnityAds.addListener(this);
         }
         catch (Exception ex)
@@ -112,7 +103,7 @@ public class UnityAddsInterface extends GodotPlugin implements IUnityAdsListener
         {
             try
             {
-                UnityAds.show(baseActivity, placementId);
+                UnityAds.show(getActivity(), placementId);
             }
             catch (Exception ex)
             {
@@ -130,14 +121,14 @@ public class UnityAddsInterface extends GodotPlugin implements IUnityAdsListener
 
     public void showBanner(final String placementID) {
         final IUnityBannerListener Listener = this;
-        baseActivity.runOnUiThread(new Runnable() {
+        getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 try
                 {
                     UnityBanners.setBannerPosition(BannerPosition.BOTTOM_CENTER);
                     UnityBanners.setBannerListener(Listener);
-                    UnityBanners.loadBanner(baseActivity, placementID);
+                    UnityBanners.loadBanner(getActivity(), placementID);
                 }
                 catch (Exception ex)
                 {

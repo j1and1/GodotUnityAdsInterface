@@ -28,3 +28,18 @@ dependencies {
     compileOnly fileTree(dir: 'libs', include: ['*.aar'])
     implementation 'androidx.annotation:annotation:1.1.0'
 }
+
+task copyResourceToOutput {
+    doLast {
+        copy {
+            from "$projectDir/../Godot/UnityAdsGodot.gdap"
+            into "$buildDir/outputs/aar/"
+        }
+        copy {
+            from "$projectDir/libs/unity-ads.aar"
+            into "$buildDir/outputs/aar/"
+        }
+    }
+}
+
+build.finalizedBy(copyResourceToOutput)

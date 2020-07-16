@@ -1,6 +1,6 @@
 # Unity ads for godot using new export template system
 
-Current version of the `unityadsgodot-release.aar` and example project is available for download under [Releases](https://github.com/j1and1/GodotUnityAdsInterface/releases)
+Current version of the `unityadsgodot-release.aar` is available for download under [Releases](https://github.com/j1and1/GodotUnityAdsInterface/releases)
 
 ## Requirements
 

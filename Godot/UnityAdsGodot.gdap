@@ -2,7 +2,7 @@
 
 name="UnityAdsGodot"
 binary_type="local"
-binary="UnityAdsGodot.aar"
+binary="unityadsgodot-release.aar"
 
 [dependencies]
 

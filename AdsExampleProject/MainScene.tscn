@@ -1,0 +1,39 @@
+[gd_scene load_steps=2 format=2]
+
+[ext_resource path="res://AdExample.gd" type="Script" id=1]
+
+[node name="Node2D" type="Node2D"]
+script = ExtResource( 1 )
+
+[node name="VideoAd" type="Button" parent="."]
+margin_left = 62.0
+margin_top = 61.0
+margin_right = 967.0
+margin_bottom = 175.0
+text = "Show video ad"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="RewardedVideo" type="Button" parent="."]
+margin_left = 61.0
+margin_top = 198.0
+margin_right = 966.0
+margin_bottom = 312.0
+text = "Show rewarded video ad"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="BannerAd" type="Button" parent="."]
+margin_left = 60.0
+margin_top = 335.0
+margin_right = 965.0
+margin_bottom = 449.0
+text = "Show Banner ad"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+[connection signal="pressed" from="VideoAd" to="." method="_on_VideoAd_pressed"]
+[connection signal="pressed" from="RewardedVideo" to="." method="_on_RewardedVideo_pressed"]
+[connection signal="pressed" from="BannerAd" to="." method="_on_BannerAd_pressed"]

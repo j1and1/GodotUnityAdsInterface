@@ -27,7 +27,7 @@ public class UnityAdsInterface extends GodotPlugin implements IUnityAdsListener,
     private final String TAG = "UnityAdsInterface";
     private SignalInfo UnityAdsReady = new SignalInfo("UnityAdsReady");
     private SignalInfo UnityAdsStart = new SignalInfo("UnityAdsStart");
-    private SignalInfo UnityAdsFinish = new SignalInfo("UnityAdsFinish",  String.class);
+    private SignalInfo UnityAdsFinish = new SignalInfo("UnityAdsFinish", String.class, String.class);
     private SignalInfo UnityAdsError = new SignalInfo("UnityAdsError", String.class);
     private SignalInfo UnityBannerLoaded = new SignalInfo("UnityBannerLoaded");
     private SignalInfo UnityBannerUnloaded = new SignalInfo("UnityBannerUnloaded");
@@ -49,30 +49,34 @@ public class UnityAdsInterface extends GodotPlugin implements IUnityAdsListener,
     @NonNull
     @Override
     public List<String> getPluginMethods() {
-        List<String> retVal = new ArrayList<String>();
-        retVal.add("initialise");
-        retVal.add("showBanner");
-        retVal.add("loadAd");
-        retVal.add("show");
-        retVal.add("hideBanner");
-        retVal.add("isReady");
-        return retVal;
+        return new ArrayList<String>() {
+            {
+                add("initialise");
+                add("showBanner");
+                add("loadAd");
+                add("show");
+                add("hideBanner");
+                add("isReady");
+            }
+        };
     }
 
     @NonNull
     @Override
     public Set<SignalInfo> getPluginSignals() {
-        Set<SignalInfo> retVal = new HashSet<SignalInfo>();
-        retVal.add(UnityAdsReady);
-        retVal.add(UnityAdsStart);
-        retVal.add(UnityAdsFinish);
-        retVal.add(UnityAdsError);
-        retVal.add(UnityBannerLoaded);
-        retVal.add(UnityBannerUnloaded);
-        retVal.add(UnityBannerShow);
-        retVal.add(UnityBannerHide);
-        retVal.add(UnityBannerError);
-        return retVal;
+        return new HashSet<SignalInfo>() {
+            {
+                add(UnityAdsReady);
+                add(UnityAdsStart);
+                add(UnityAdsFinish);
+                add(UnityAdsError);
+                add(UnityBannerLoaded);
+                add(UnityBannerUnloaded);
+                add(UnityBannerShow);
+                add(UnityBannerHide);
+                add(UnityBannerError);
+            }
+        };
     }
 
     public void initialise(String appId, boolean testMode)
@@ -160,7 +164,7 @@ public class UnityAdsInterface extends GodotPlugin implements IUnityAdsListener,
     }
 
     @Override
-    public void onUnityAdsFinish(String s, UnityAds.FinishState finishState) {
+    public void onUnityAdsFinish(String placement, UnityAds.FinishState finishState) {
         int state = -1;
 
         // Implement conditional logic for each ad completion status:
@@ -172,11 +176,11 @@ public class UnityAdsInterface extends GodotPlugin implements IUnityAdsListener,
             state = 1;
         } else if (finishState == UnityAds.FinishState.ERROR) {
             // Log an error.
-            Log.e(TAG, s);
+            Log.e(TAG, placement);
             state = 0;
         }
 
-        emitSignal(UnityAdsFinish.getName(), s.toString());
+        emitSignal(UnityAdsFinish.getName(), placement, String.format("%d", state));
     }
 
     @Override
@@ -214,5 +218,6 @@ public class UnityAdsInterface extends GodotPlugin implements IUnityAdsListener,
     public void onUnityBannerError(String s) {
         emitSignal(UnityBannerError.getName(), s);
         Log.e(TAG, s);
+        hideBanner();
     }
 }

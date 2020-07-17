@@ -1,15 +1,16 @@
 package com.jandans.unityaddsgodot;
 
-import android.app.Activity;
 import android.util.Log;
 import android.view.View;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 
 import com.unity3d.ads.IUnityAdsListener;
 import com.unity3d.ads.UnityAds;
+import com.unity3d.services.banners.BannerErrorInfo;
+import com.unity3d.services.banners.BannerView;
 import com.unity3d.services.banners.IUnityBannerListener;
+import com.unity3d.services.banners.UnityBannerSize;
 import com.unity3d.services.banners.UnityBanners;
 import com.unity3d.services.banners.view.BannerPosition;
 
@@ -22,19 +23,18 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class UnityAdsInterface extends GodotPlugin implements IUnityAdsListener, IUnityBannerListener {
+public class UnityAdsInterface extends GodotPlugin implements IUnityAdsListener, BannerView.IListener {
 
     private final String TAG = "UnityAdsInterface";
-    private SignalInfo UnityAdsReady = new SignalInfo("UnityAdsReady");
-    private SignalInfo UnityAdsStart = new SignalInfo("UnityAdsStart");
-    private SignalInfo UnityAdsFinish = new SignalInfo("UnityAdsFinish", String.class, String.class);
-    private SignalInfo UnityAdsError = new SignalInfo("UnityAdsError", String.class);
-    private SignalInfo UnityBannerLoaded = new SignalInfo("UnityBannerLoaded");
-    private SignalInfo UnityBannerUnloaded = new SignalInfo("UnityBannerUnloaded");
-    private SignalInfo UnityBannerShow = new SignalInfo("UnityBannerShow");
-    private SignalInfo UnityBannerClick = new SignalInfo("UnityBannerClick");
-    private SignalInfo UnityBannerHide = new SignalInfo("UnityBannerHide");
-    private SignalInfo UnityBannerError = new SignalInfo("UnityBannerError", String.class);
+    private SignalInfo rnityAdsReady = new SignalInfo("UnityAdsReady");
+    private SignalInfo unityAdsStart = new SignalInfo("UnityAdsStart");
+    private SignalInfo unityAdsFinish = new SignalInfo("UnityAdsFinish", String.class, String.class);
+    private SignalInfo unityAdsError = new SignalInfo("UnityAdsError", String.class);
+    private SignalInfo unityBannerLoaded = new SignalInfo("UnityBannerLoaded");
+    private SignalInfo unityBannerClick = new SignalInfo("UnityBannerClick");
+    private SignalInfo unityBannerLeftApp = new SignalInfo("UnityBannerLeftApp");
+    private SignalInfo unityBannerError = new SignalInfo("UnityBannerError", String.class);
+    private BannerView bannerView = null;
 
     public UnityAdsInterface(Godot godot) {
         super(godot);
@@ -66,15 +66,14 @@ public class UnityAdsInterface extends GodotPlugin implements IUnityAdsListener,
     public Set<SignalInfo> getPluginSignals() {
         return new HashSet<SignalInfo>() {
             {
-                add(UnityAdsReady);
-                add(UnityAdsStart);
-                add(UnityAdsFinish);
-                add(UnityAdsError);
-                add(UnityBannerLoaded);
-                add(UnityBannerUnloaded);
-                add(UnityBannerShow);
-                add(UnityBannerHide);
-                add(UnityBannerError);
+                add(rnityAdsReady);
+                add(unityAdsStart);
+                add(unityAdsFinish);
+                add(unityAdsError);
+                add(unityBannerLoaded);
+                add(unityBannerClick);
+                add(unityBannerError);
+                add(unityBannerLeftApp);
             }
         };
     }
@@ -124,43 +123,28 @@ public class UnityAdsInterface extends GodotPlugin implements IUnityAdsListener,
     }
 
     public void showBanner(final String placementID) {
-        final IUnityBannerListener Listener = this;
-        getActivity().runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                try
-                {
-                    UnityBanners.setBannerPosition(BannerPosition.BOTTOM_CENTER);
-                    UnityBanners.setBannerListener(Listener);
-                    UnityBanners.loadBanner(getActivity(), placementID);
-                }
-                catch (Exception ex)
-                {
-                    Log.e(TAG, ex.getMessage());
-                }
-            }
-        });
+        final UnityBannerSize bannerSize = new UnityBannerSize(320, 50);
+        hideBanner();
+        bannerView = new BannerView(getActivity(), placementID, bannerSize);
+        bannerView.setListener(this);
+        bannerView.load();
     }
 
     public void hideBanner() {
-        try
-        {
-            UnityBanners.destroy();
-        }
-        catch (Exception ex)
-        {
-            Log.e(TAG, ex.getMessage());
+        if (bannerView != null) {
+            bannerView.destroy();
+            bannerView = null;
         }
     }
 
     @Override
     public void onUnityAdsReady(String s) {
-        emitSignal(UnityAdsReady.getName());
+        emitSignal(rnityAdsReady.getName());
     }
 
     @Override
     public void onUnityAdsStart(String s) {
-        emitSignal(UnityAdsStart.getName());
+        emitSignal(unityAdsStart.getName());
     }
 
     @Override
@@ -180,44 +164,33 @@ public class UnityAdsInterface extends GodotPlugin implements IUnityAdsListener,
             state = 0;
         }
 
-        emitSignal(UnityAdsFinish.getName(), placement, String.format("%d", state));
+        emitSignal(unityAdsFinish.getName(), placement, String.format("%d", state));
     }
 
     @Override
     public void onUnityAdsError(UnityAds.UnityAdsError unityAdsError, String s) {
-        emitSignal(UnityAdsError.getName(), s);
+        emitSignal(this.unityAdsError.getName(), s);
         Log.e(TAG, s);
     }
     //Banner stuff goes here
     @Override
-    public void onUnityBannerLoaded(String s, View view) {
-        emitSignal(UnityBannerLoaded.getName());
+    public void onBannerLoaded(BannerView bannerView) {
+        emitSignal(unityBannerLoaded.getName());
     }
 
     @Override
-    public void onUnityBannerUnloaded(String s) {
-        emitSignal(UnityBannerUnloaded.getName());
+    public void onBannerClick(BannerView bannerView) {
+        emitSignal(unityBannerClick.getName());
     }
 
     @Override
-    public void onUnityBannerShow(String s) {
-        emitSignal(UnityBannerShow.getName());
+    public void onBannerFailedToLoad(BannerView bannerView, BannerErrorInfo bannerErrorInfo) {
+        emitSignal(unityBannerError.getName(), bannerErrorInfo.errorMessage);
+        Log.e(TAG, bannerErrorInfo.errorMessage);
     }
 
     @Override
-    public void onUnityBannerClick(String s) {
-        emitSignal(UnityBannerClick.getName());
-    }
-
-    @Override
-    public void onUnityBannerHide(String s) {
-        emitSignal(UnityBannerHide.getName(), s);
-    }
-
-    @Override
-    public void onUnityBannerError(String s) {
-        emitSignal(UnityBannerError.getName(), s);
-        Log.e(TAG, s);
-        hideBanner();
+    public void onBannerLeftApplication(BannerView bannerView) {
+        emitSignal(unityBannerLeftApp.getName());
     }
 }

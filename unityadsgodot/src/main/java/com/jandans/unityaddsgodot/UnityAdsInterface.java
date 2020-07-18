@@ -2,6 +2,7 @@ package com.jandans.unityaddsgodot;
 
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 
@@ -82,7 +83,7 @@ public class UnityAdsInterface extends GodotPlugin implements IUnityAdsListener,
     {
         try
         {
-            UnityAds.initialize(getActivity(), appId, testMode);
+            UnityAds.initialize(getActivity(), appId, testMode, true);
             UnityAds.addListener(this);
         }
         catch (Exception ex)
@@ -127,13 +128,33 @@ public class UnityAdsInterface extends GodotPlugin implements IUnityAdsListener,
         hideBanner();
         bannerView = new BannerView(getActivity(), placementID, bannerSize);
         bannerView.setListener(this);
-        bannerView.load();
+        // try to add it to root view
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                final ViewGroup viewGroup = (ViewGroup) ((ViewGroup) getActivity().findViewById(android.R.id.content)).getRootView();
+                if (viewGroup != null)
+                {
+                    viewGroup.addView(bannerView);
+                    bannerView.load();
+                }
+            }
+        });
     }
 
     public void hideBanner() {
         if (bannerView != null) {
-            bannerView.destroy();
-            bannerView = null;
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    ViewGroup parentView = (ViewGroup) bannerView.getParent();
+                    if (parentView != null) {
+                        parentView.removeView(bannerView);
+                    }
+                    bannerView.destroy();
+                    bannerView = null;
+                }
+            });
         }
     }
 
